@@ -2,7 +2,7 @@ import tkinter as tk
 from tkinter import ttk, messagebox
 from ttkthemes import ThemedTk
 
-def create_gui(root, db):
+def create_gui(root, db, on_sign_out=None):
     # Configure style
     style = ttk.Style()
     style.configure('TLabel', font=('Segoe UI', 10))
@@ -11,12 +11,25 @@ def create_gui(root, db):
     style.configure('Treeview', font=('Segoe UI', 10))
     style.configure('Treeview.Heading', font=('Segoe UI', 10, 'bold'))
     
+    # Header frame for title and sign out
+    header_frame = ttk.Frame(root)
+    header_frame.grid(row=0, column=0, sticky="ew", padx=20, pady=(10, 0))
+    
+    # App title
+    title_label = ttk.Label(header_frame, text="Book Manager", font=('Segoe UI', 16, 'bold'))
+    title_label.pack(side=tk.LEFT)
+    
+    # Sign out button
+    if on_sign_out:
+        sign_out_btn = ttk.Button(header_frame, text="Sign Out", command=on_sign_out)
+        sign_out_btn.pack(side=tk.RIGHT)
+    
     # Main container with padding
     main_frame = ttk.Frame(root, padding="20")
-    main_frame.grid(row=0, column=0, sticky="nsew")
+    main_frame.grid(row=1, column=0, sticky="nsew")
     
     # Configure grid weights
-    root.grid_rowconfigure(0, weight=1)
+    root.grid_rowconfigure(1, weight=1)
     root.grid_columnconfigure(0, weight=1)
     main_frame.grid_columnconfigure(1, weight=1)
     
