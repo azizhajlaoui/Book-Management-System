@@ -12,9 +12,9 @@ load_dotenv()
 class App:
     def __init__(self):
         # Create themed root window
-        self.root = ThemedTk(theme="arc")  # Using the 'arc' theme for a modern look
+        self.root = ThemedTk(theme="arc") 
         self.root.title("Book Manager")
-        self.root.geometry("900x700")  # Set a reasonable default size
+        self.root.geometry("900x700")
         
         # Initialize database
         self.db = BookDatabase()
