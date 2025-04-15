@@ -17,7 +17,7 @@ class App:
         self.root.geometry("900x700")
         
         # Initialize database
-        self.db = BookDatabase()
+        self.db = BookDatabase(user="root", password="password")
         
         # Create authentication frame
         self.auth_frame = AuthFrame(self.root, self.db, self.on_login_success)

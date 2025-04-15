@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
 import re
-from email_utils import EmailSender
+from database import BookDatabase
 
 class AuthFrame(ttk.Frame):
     def __init__(self, parent, db, on_login_success):
@@ -9,7 +9,7 @@ class AuthFrame(ttk.Frame):
         self.db = db
         self.on_login_success = on_login_success
         self.email_sender = EmailSender()
-        
+
         # Create main container
         self.main_container = ttk.Frame(self)
         self.main_container.pack(expand=True, fill='both', padx=10, pady=10)
@@ -108,6 +108,7 @@ class AuthFrame(ttk.Frame):
         # Submit button
         ttk.Button(frame, text="Reset Password", command=self._handle_forgot_password).grid(row=1, column=0, columnspan=2, pady=20)
         
+
         # Back to login button
         ttk.Button(frame, text="Back to Login", 
                    command=lambda: self.show_frame('login')).grid(row=2, column=0, columnspan=2, pady=10)
@@ -182,19 +183,14 @@ class AuthFrame(ttk.Frame):
         if not email:
             messagebox.showerror("Error", "Please enter your email")
             return
-        
-        try:
-            token = self.db.generate_reset_token(email)
-            if token:
-                if self.email_sender.send_reset_token(email, token):
-                    messagebox.showinfo("Success", "A password reset token has been sent to your email.")
-                    self.reset_frame.grid(row=2, column=0, columnspan=2, pady=10)
-                else:
-                    messagebox.showerror("Error", "Failed to send reset token email. Please try again later.")
+
+        token = self.db.generate_reset_token(email)
+        if token:
+            if self.email_sender.send_reset_token(email, token):
+                messagebox.showinfo("Success", "A password reset token has been sent to your email.")
+                self.reset_frame.grid(row=2, column=0, columnspan=2, pady=10)
             else:
-                messagebox.showerror("Error", "Email not found")
-        except ValueError as e:
-            messagebox.showerror("Error", str(e))
+                messagebox.showerror("Error", "Failed to send reset token email. Please try again later.")
         else:
             messagebox.showerror("Error", "Email not found")
 
