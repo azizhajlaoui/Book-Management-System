@@ -16,8 +16,13 @@ class App:
         self.root.title("Book Manager")
         self.root.geometry("900x700")
         
-        # Initialize database
-        self.db = BookDatabase(user="root", password="password")
+        # Initialize database with environment variables
+        self.db = BookDatabase(
+            user=os.getenv('MYSQL_USER', 'root'),
+            password=os.getenv('MYSQL_PASSWORD', ''),
+            host=os.getenv('MYSQL_HOST', 'localhost'),
+            database=os.getenv('MYSQL_DATABASE', 'books_db')
+        )
         
         # Create authentication frame
         self.auth_frame = AuthFrame(self.root, self.db, self.on_login_success)

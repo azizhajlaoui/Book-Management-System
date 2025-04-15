@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import ttk, messagebox
 import re
 from database import BookDatabase
+from email_utils import EmailSender
 
 class AuthFrame(ttk.Frame):
     def __init__(self, parent, db, on_login_success):

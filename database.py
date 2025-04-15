@@ -50,9 +50,11 @@ class BookDatabase:
                         password_hash VARCHAR(255) NOT NULL,
                         salt VARCHAR(255) NOT NULL,
                         email VARCHAR(255) UNIQUE NOT NULL,
-                        reset_token VARCHAR(255)
+                        reset_token VARCHAR(255),
+                        reset_token_expiry DATETIME
                     )
                 ''')
+
                 cnx.commit()
         except mysql.connector.Error as err:
             print(f"Error creating tables: {err}")
@@ -106,11 +108,13 @@ class BookDatabase:
         password_hash, salt = self._hash_password(password)
         try:
             with self.connect() as conn:
-                conn.execute('''
+                cursor = conn.cursor()
+                cursor.execute('''
                     INSERT INTO users (username, password_hash, salt, email)
                     VALUES (%s, %s, %s, %s)
-                ''', (username, password_hash, salt, email))  # Use %s for MySQL
+                ''', (username, password_hash, salt, email))
                 conn.commit()
+                cursor.close()
                 return True
         except mysql.connector.IntegrityError:
             return False
@@ -118,7 +122,10 @@ class BookDatabase:
     def verify_user(self, username, password):
         # Verify user credentials
         with self.connect() as conn:
-            user = conn.execute('SELECT password_hash, salt FROM users WHERE username=?', (username,)).fetchone()
+            cursor = conn.cursor()
+            cursor.execute('SELECT password_hash, salt FROM users WHERE username=%s', (username,))
+            user = cursor.fetchone()
+            cursor.close()
             if user:
                 password_hash, salt = user
                 verify_hash, _ = self._hash_password(password, salt)
@@ -144,12 +151,13 @@ class BookDatabase:
             user = cursor.fetchone()
             if user:
                 password_hash, salt = self._hash_password(new_password)
-                conn.execute('''
+                cursor.execute('''
                     UPDATE users 
-                    SET password_hash=?, salt=?, reset_token=NULL 
-                    WHERE id=?
+                    SET password_hash=%s, salt=%s, reset_token=NULL 
+                    WHERE id=%s
                 ''', (password_hash, salt, user[0]))
                 cnx.commit()
+                cursor.close()
                 return True
         return False
 
